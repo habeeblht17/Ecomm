@@ -7,7 +7,7 @@
         {{ __('Update your account\'s profile information and email address.') }}
     </x-slot>
 
-    <x-slot name="form">
+    <x-slot name="form" class="w-full">
         <!-- Profile Photo -->
         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
             <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
