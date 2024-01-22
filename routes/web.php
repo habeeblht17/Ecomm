@@ -25,8 +25,12 @@ Route::get('/about-us', function () {
 Route::get('/contact-us', function () {
     return view('pages.contact-us');
 })->name('contact-us');
+Route::get('/cart', function () {
+    return view('pages.cart');
+})->name('cart');
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',])->group(function () {
+
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'admin.redirect', 'verified',])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
