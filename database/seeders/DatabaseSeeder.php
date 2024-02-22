@@ -33,10 +33,11 @@ class DatabaseSeeder extends Seeder
         //     'current_team_id' => null,
         // ]);
 
-        // \App\Models\User::factory(10)->create();
-        // \App\Models\Brand::factory(10)->create();
-        // \App\Models\Category::factory(10)->create();
-        // \App\Models\Product::factory(10)->create();
+        // \App\Models\Brand::factory(5)->create();
+        // \App\Models\Category::factory(5)->create();
+        \App\Models\Product::factory(5)->create();
+        // \App\Models\User::factory(5)->create();
+
 
     }
 }

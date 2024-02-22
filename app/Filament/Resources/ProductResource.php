@@ -2,29 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\ProductStockEnum;
-use App\Enums\ProductTypeEnum;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Product;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
+use App\Enums\ProductTypeEnum;
+use App\Enums\ProductStockEnum;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Columns\BooleanColumn;
+use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductResource\RelationManagers;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 class ProductResource extends Resource
 {
@@ -44,10 +48,28 @@ class ProductResource extends Resource
 
                     Section::make()->schema([
 
-                        TextInput::make('name'),
-                        TextInput::make('slug'),
+                        TextInput::make('name')
+                        ->required()
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
+
+                            if($operation !== 'create') {
+                                return;
+                            }
+
+                            $set('slug', Str::slug($state));
+                        }),
+
+                        TextInput::make('slug')
+                        ->disabled()
+                        ->dehydrated()
+                        ->required()
+                        ->unique(Product::class, 'slug', ignoreRecord: true, ),
+
+                        MarkdownEditor::make('description')
+                        ->required(),
                         MarkdownEditor::make('short_description'),
-                        MarkdownEditor::make('description'),
+
                     ])->columns(2),
 
                 ])->columnSpan('full'),
@@ -57,17 +79,33 @@ class ProductResource extends Resource
 
                     Section::make('Price & Inventory')->schema([
 
-                        TextInput::make('sku'),
-                        TextInput::make('price'),
-                        TextInput::make('quantity'),
+                        TextInput::make('sku')
+                        ->label("SKU (Stock Keeping Unit)")
+                        ->unique(Product::class, 'sku', ignoreRecord: true,)
+                        ->required(),
+
+                        TextInput::make('price')
+                        ->numeric()
+                        //->rule('reqex:/^\d{1,6}(\.\d{0,2})?$/')
+                        ->required(),
+
+                        TextInput::make('quantity')
+                        ->numeric()
+                        ->minValue(1)
+                        ->required(),
+
                         Select::make('stock')->options([
                             'instock' => ProductStockEnum::INSTOCK->value,
                             'outofstock' => ProductStockEnum::OUTOFSTOCK->value,
-                        ]),
+                        ])
+                        ->required(),
+
                         Select::make('type')->options([
                             'deliverable' => ProductTypeEnum::DELIVERABLE->value,
                             'downloadable' => ProductTypeEnum::DOWNLOADABLE->value,
-                        ]),
+                        ])
+                        ->required(),
+
                     ])->columns(2),
 
                     Section::make('Association')->schema([
@@ -81,15 +119,29 @@ class ProductResource extends Resource
 
                     Section::make('Status')->schema([
 
-                        Toggle::make('is_visible'),
-                        Toggle::make('is_featured'),
-                        DatePicker::make('published_at'),
+                        Toggle::make('is_visible')
+                        ->label('Visibility')
+                        ->helperText('Enable or Disable  Product Visibility')
+                        ->default(true),
+
+                        Toggle::make('is_featured')
+                        ->label('Featured')
+                        ->helperText('Enable or Disable  Product Featured Status'),
+
+                        DatePicker::make('published_at')
+                        ->label('Availability')
+                        ->default(now()),
 
                     ]),
 
                     Section::make('Image')->schema([
 
                         FileUpload::make('image')
+                        ->directory('products')
+                        ->preserveFilenames()
+                        ->image()
+                        ->imageEditor(),
+
                     ])->collapsible(),
 
                 ]),
@@ -100,18 +152,51 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('image'),
-                TextColumn::make('brand.name'),
-                TextColumn::make('name'),
-                IconColumn::make('is_visible')->boolean(),
-                TextColumn::make('price'),
-                TextColumn::make('quantity'),
-                TextColumn::make('published_at'),
-                TextColumn::make('type'),
-                TextColumn::make('stock'),
+                ImageColumn::make('image'),
+                TextColumn::make('brand.name')
+                ->searchable()
+                ->sortable()
+                ->toggleable(),
+
+                TextColumn::make('name')
+                ->searchable()
+                ->sortable(),
+
+                TextColumn::make('price')
+                ->searchable()
+                ->sortable(),
+
+                TextColumn::make('quantity')
+                ->toggleable(),
+
+                IconColumn::make('is_visible')
+                ->boolean()
+                ->label('Visibility')
+                ->sortable()
+                ->toggleable(),
+
+                TextColumn::make('published_at')
+                ->date()
+                ->label('Published Date')
+                ->sortable()
+                ->toggleable(),
+
+                TextColumn::make('type')
+                ->toggleable(),
+
+                TextColumn::make('stock')
+                ->toggleable(),
             ])
             ->filters([
-                //
+                TernaryFilter::make('is_visible')
+                ->label('Visibility')
+                ->boolean()
+                ->trueLabel('Only Visible Products')
+                ->falseLabel('Only Hidden Products')
+                ->native(false),
+
+                SelectFilter::make('brand')
+                ->relationship('brand', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
