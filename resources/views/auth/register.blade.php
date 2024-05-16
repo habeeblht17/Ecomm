@@ -14,6 +14,9 @@
                 <label for="name">Full Name</label>
                 <input class="px-4 py-2 mt-3 mb-3 border" type="text" name="name" :value="old('name')" placeholder="Bogdan Bulakh" required />
 
+                <label for="name">Username</label>
+                <input class="px-4 py-2 mt-3 mb-3 border" type="text" name="username" :value="old('username')" placeholder="sypha" />
+
                 <label class="mt-3" for="email">Email Address</label>
                 <input class="px-4 py-2 mt-3 border" type="email" name="email" :value="old('email')" placeholder="user@mail.com" required />
 

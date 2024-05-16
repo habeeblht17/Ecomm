@@ -38,7 +38,7 @@ class User extends Authenticatable implements FilamentUser
      */
     public function isAdmin()
     {
-        return $this->role === 1;
+        return $this->role === 'admin';
     }
 
 
@@ -49,6 +49,7 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'role',
