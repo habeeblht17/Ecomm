@@ -16,18 +16,49 @@ class Category extends Model
         'parent_id', 'name', 'slug', 'description', 'is_visible', 'image',
     ];
 
+    /**
+     * scopeVisible
+     *
+     * @param  mixed $query
+     * @return void
+     */
+    public function scopeVisible($query)
+    {
+        $query->where('is_visible', true);
+    }
+
+
+    /**
+     * parent
+     *
+     * @return BelongsTo
+     */
     public function parent() : BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
+
+    /**
+     * child
+     *
+     * @return HasMany
+     */
     public function child() : HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
 
+
+    /**
+     * products
+     *
+     * @return BelongsToMany
+     */
     public function products() : BelongsToMany
     {
         return $this->belongsToMany(Product::class);
     }
+
+
 }

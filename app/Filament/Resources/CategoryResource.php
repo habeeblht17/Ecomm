@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
-use App\Models\Brand;
+use App\Models\Category;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -15,32 +15,29 @@ use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\MarkdownEditor;
-use App\Filament\Resources\BrandResource\Pages;
+use App\Filament\Resources\CategoryResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\BrandResource\RelationManagers;
-use Filament\Tables\Actions\ActionGroup;
+use App\Filament\Resources\CategoryResource\RelationManagers;
+use Filament\Forms\Components\Select;
 
-class BrandResource extends Resource
+class CategoryResource extends Resource
 {
-    protected static ?string $model = Brand::class;
+    protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $navigationGroup = 'Shop';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-
                 Group::make()->schema([
 
                     Section::make()->schema([
@@ -61,7 +58,7 @@ class BrandResource extends Resource
                         ->disabled()
                         ->dehydrated()
                         ->required()
-                        ->unique(Brand::class, 'slug', ignoreRecord: true, ),
+                        ->unique(Category::class, 'slug', ignoreRecord: true, ),
 
                         MarkdownEditor::make('description')
                         ->required()
@@ -74,11 +71,6 @@ class BrandResource extends Resource
                 // Section Status
                 Group::make()->schema([
 
-                    Section::make('Color')->schema([
-                        ColorPicker::make('brand_color')
-                        ->label('Brand Color')
-                    ]),
-
                     Section::make('Status')->schema([
 
                         Toggle::make('is_visible')
@@ -86,13 +78,17 @@ class BrandResource extends Resource
                         ->helperText('Enable or Disable  Product Visibility')
                         ->default(true),
 
+                        Select::make('parent_id')
+                        ->label('Parent Category')
+                        ->relationship('parent', 'name'),
+
                     ]),
 
                     // Section Image
                     Section::make('Image')->schema([
 
                         FileUpload::make('image')
-                        ->directory('brands')
+                        ->directory('categories')
                         ->preserveFilenames()
                         ->image()
                         ->imageEditor(),
@@ -100,7 +96,6 @@ class BrandResource extends Resource
                     ])->collapsible(),
 
                 ]),
-
             ]);
     }
 
@@ -108,20 +103,21 @@ class BrandResource extends Resource
     {
         return $table
             ->columns([
-
                 ImageColumn::make('image'),
 
                 TextColumn::make('name')
                 ->searchable()
                 ->sortable(),
 
-                TextColumn::make('slug')
+                TextColumn::make('parent.name')
+                ->label('Parent Category')
                 ->searchable()
                 ->sortable()
                 ->toggleable(),
 
-                ColorColumn::make('brand_color')
+                TextColumn::make('slug')
                 ->searchable()
+                ->sortable()
                 ->toggleable(),
 
                 IconColumn::make('is_visible')
@@ -129,15 +125,12 @@ class BrandResource extends Resource
                 ->label('Visibility')
                 ->sortable()
                 ->toggleable(),
-
-
             ])
             ->filters([
                 //
             ])
             ->actions([
-
-                ActionGroup::make([
+                Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
@@ -160,9 +153,9 @@ class BrandResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBrands::route('/'),
-            'create' => Pages\CreateBrand::route('/create'),
-            'edit' => Pages\EditBrand::route('/{record}/edit'),
+            'index' => Pages\ListCategories::route('/'),
+            'create' => Pages\CreateCategory::route('/create'),
+            'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
     }
 }
