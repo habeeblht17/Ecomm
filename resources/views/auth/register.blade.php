@@ -2,7 +2,7 @@
     <!-- Register card  -->
     <section class="mx-auto mt-10 w-full flex-grow mb-10 max-w-[1200px] px-5">
         <div class="container px-5 py-5 mx-auto border shadow-sm md:w-1/2">
-            
+
             <div class="">
                 <p class="text-4xl font-bold">CREATE AN ACCOUNT</p>
                 <p>Register for new customer</p>
@@ -12,10 +12,7 @@
                 @csrf
 
                 <label for="name">Full Name</label>
-                <input class="px-4 py-2 mt-3 mb-3 border" type="text" name="name" :value="old('name')" placeholder="Bogdan Bulakh" required />
-
-                <label for="name">Username</label>
-                <input class="px-4 py-2 mt-3 mb-3 border" type="text" name="username" :value="old('username')" placeholder="sypha" />
+                <input class="px-4 py-2 mt-3 mb-3 border" type="text" name="name" :value="old('name')" placeholder="Sypha Sypha" required />
 
                 <label class="mt-3" for="email">Email Address</label>
                 <input class="px-4 py-2 mt-3 border" type="email" name="email" :value="old('email')" placeholder="user@mail.com" required />

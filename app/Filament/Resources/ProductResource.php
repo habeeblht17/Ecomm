@@ -88,6 +88,7 @@ class ProductResource extends Resource
 
                         TextInput::make('price')
                         ->numeric()
+                        ->inputMode('decimal')
                         //->rule('reqex:/^\d{1,6}(\.\d{0,2})?$/')
                         ->required(),
 

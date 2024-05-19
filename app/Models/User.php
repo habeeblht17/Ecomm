@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Panel;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Jetstream\HasProfilePhoto;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
@@ -19,7 +20,7 @@ class User extends Authenticatable implements FilamentUser
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    
+
     /**
      * canAccessPanel
      *
@@ -28,9 +29,26 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->isAdmin();
+        $user = Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        $roles = $user->role;
+
+        if($panel->getId() === 'admin' && $roles === 'admin') {
+            return true;
+        }
+        elseif ($panel->getId() === 'vendor' && $roles === 'vendor') {
+            return true;
+        }
+        else {
+            return false;
+        }
+
     }
-    
+
     /**
      * isAdmin
      *
