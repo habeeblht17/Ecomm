@@ -114,8 +114,9 @@ class ProductResource extends Resource
                     Section::make('Association')->schema([
 
                         Select::make('brand_id')
-                            ->relationship('brand', 'name')
-                            ->required(),
+                        ->relationship('brand', 'name')
+                        ->required()
+                        ->native(false),
                     ]),
 
                 ]),
@@ -211,7 +212,8 @@ class ProductResource extends Resource
                 ->native(false),
 
                 SelectFilter::make('brand')
-                ->relationship('brand', 'name'),
+                ->relationship('brand', 'name')
+                ->native(false),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
