@@ -34,7 +34,9 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
-        if($this->imagePaths){
+        $filename = null;
+
+        if ($this->imagePaths) {
             // Get a random image path from the array
             $randomImagePath = Arr::random($this->imagePaths);
 
@@ -42,16 +44,24 @@ class ProductFactory extends Factory
             $filename = uniqid('image_') . '.png';
 
             $imagePath = public_path($randomImagePath);
-            $newImagePath = public_path('storage/products/' . $filename);
+            $newImagePath = storage_path('app/public/products/' . $filename);
+
+            // Ensure the destination directory exists
+            if (!File::exists(dirname($newImagePath))) {
+                File::makeDirectory(dirname($newImagePath), 0755, true);
+            }
 
             if (File::exists($imagePath)) {
                 File::copy($imagePath, $newImagePath);
+            } else {
+                $filename = null; // Reset filename if the image copy fails
             }
         }
+
         $name = $this->faker->words(2, true);
 
         return [
-            'brand_id' => Brand::inRandomOrder()->first() ?: Brand::factory()->create()->id,
+            'brand_id' => Brand::inRandomOrder()->first()->id ?? Brand::factory()->create()->id,
             'name' => $name,
             'slug' => Str::slug($name),
             'short_description' => $this->faker->text(100),
@@ -63,8 +73,9 @@ class ProductFactory extends Factory
             'quantity' => $this->faker->numberBetween(1, 50),
             'is_visible' => $this->faker->boolean,
             'is_featured' => $this->faker->boolean,
-            'image' => $filename,
-            'published_at' => Carbon::now()
+            'image' => $filename ? 'storage/products/' . $filename : null,
+            'published_at' => Carbon::now(),
         ];
     }
+
 }

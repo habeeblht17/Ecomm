@@ -70,9 +70,9 @@ class SliderResource extends Resource
 
                         Section::make('Status')->schema([
 
-                            Toggle::make('status')
-                            ->label('Activate/Inactivate')
-                            ->helperText('Enable or Disable Banner Activeness')
+                            Toggle::make('is_Visible')
+                            ->label('Visibility')
+                            ->helperText('Enable or Disable  Product Visibility')
                             ->default(true),
 
                         ]),

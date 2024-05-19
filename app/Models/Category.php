@@ -13,7 +13,7 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = [
-        'parent_id', 'name', 'slug', 'description', 'is_visible', 'image',
+        'name', 'slug', 'description', 'is_visible', 'image',
     ];
 
     /**
@@ -29,26 +29,24 @@ class Category extends Model
 
 
     /**
-     * parent
-     *
-     * @return BelongsTo
-     */
-    public function parent() : BelongsTo
-    {
-        return $this->belongsTo(Category::class, 'parent_id');
-    }
-
-
-    /**
-     * child
+     * subCategories
      *
      * @return HasMany
      */
-    public function child() : HasMany
+    public function subCategories() : HasMany
     {
-        return $this->hasMany(Category::class, 'parent_id');
+        return $this->hasMany(SubCategory::class);
     }
 
+    /**
+     * childCategories
+     *
+     * @return HasMany
+     */
+    public function childCategories() : HasMany
+    {
+        return $this->hasMany(ChildCategory::class);
+    }
 
     /**
      * products

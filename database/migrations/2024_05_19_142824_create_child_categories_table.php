@@ -11,16 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sliders', function (Blueprint $table) {
+        Schema::create('child_categories', function (Blueprint $table) {
             $table->id();
-            $table->text('banner')->nullable();
-            $table->string('name')->nullable();
-            $table->string('type')->unique()->nullable(); // example New Arival, Best Sales Product etc.
-            $table->decimal('starting_price', 8, 2)->nullable();
-            $table->string('btn_url')->nullable();
-            $table->integer('serial')->unique()->nullable();
+            $table->foreignId('category_id')->nullable()->constrained('categories')->cascadeOnDelete();
+            $table->foreignId('sub_category_id')->nullable()->constrained('sub_categories')->cascadeOnDelete();
+            $table->string('name');
+            $table->string('slug')->unique();
             $table->boolean('is_visible')->default(false);
-
             $table->timestamps();
         });
     }
@@ -30,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sliders');
+        Schema::dropIfExists('child_categories');
     }
 };

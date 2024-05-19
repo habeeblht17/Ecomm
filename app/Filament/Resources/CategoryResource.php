@@ -78,10 +78,6 @@ class CategoryResource extends Resource
                         ->helperText('Enable or Disable  Product Visibility')
                         ->default(true),
 
-                        Select::make('parent_id')
-                        ->label('Parent Category')
-                        ->relationship('parent', 'name'),
-
                     ]),
 
                     // Section Image
@@ -108,12 +104,6 @@ class CategoryResource extends Resource
                 TextColumn::make('name')
                 ->searchable()
                 ->sortable(),
-
-                TextColumn::make('parent.name')
-                ->label('Parent Category')
-                ->searchable()
-                ->sortable()
-                ->toggleable(),
 
                 TextColumn::make('slug')
                 ->searchable()

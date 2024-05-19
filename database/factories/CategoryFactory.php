@@ -24,7 +24,6 @@ class CategoryFactory extends Factory
         $name = $this->faker->words(2, true);
 
         return [
-            'parent_id' => null, // Assuming it can be null. Otherwise, you need to assign a valid parent ID.
             'name' => $name,
             'slug' => Str::slug($name),
             'description' => $this->faker->sentence,
