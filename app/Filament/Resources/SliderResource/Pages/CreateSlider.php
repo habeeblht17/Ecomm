@@ -10,7 +10,6 @@ class CreateSlider extends CreateRecord
 {
     protected static string $resource = SliderResource::class;
 
-
     /**
      * getRedirectUrl
      *

@@ -1,28 +1,42 @@
 import './bootstrap';
-import '@splidejs/splide/dist/css/splide.min.css';
-import Splide from '@splidejs/splide';
+
+//SwiperJs
+// core version + navigation, pagination modules:
+import Swiper from 'swiper';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+
+// import Swiper and modules styles
+import 'swiper/css';
+//import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import Alpine from 'alpinejs';
 
 // Start AlpineJS
 window.Alpine = Alpine;
 Alpine.start();
 
-// Start Splide
-if (document.querySelector('.splide')) {
-  let splide = new Splide(".splide", {
-    type: "loop",
-    focus: 0,
-    gap: "1rem",
-    perPage: 4,
-    breakpoints: {
-      640: {
-        perPage: 2,
-      },
-      480: {
-        perPage: 1,
-      },
-    },
-  });
 
-  splide.mount();
-}
+// init Swiper:
+const swiper = new Swiper('.swiper', {
+  // configure Swiper to use modules
+  modules: [Navigation, Pagination, Autoplay],
+  speed: 1200,
+  loop: true,
+
+  autoplay: {
+    delay: 4500,
+    disableOnInteraction: false,
+  },
+
+  // If we need pagination
+  pagination: {
+    el: '.swiper-pagination',
+  },
+
+  // Navigation arrows
+  navigation: {
+    nextEl: '.swiper-button-next',
+    prevEl: '.swiper-button-prev',
+  },
+
+});

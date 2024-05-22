@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('sliders', function (Blueprint $table) {
             $table->id();
-            $table->text('banner')->nullable();
-            $table->string('name')->nullable();
+            $table->string('banner')->nullable();
             $table->string('type')->unique()->nullable(); // example New Arival, Best Sales Product etc.
+            $table->tinyText('description')->nullable();
             $table->decimal('starting_price', 8, 2)->nullable();
             $table->string('btn_url')->nullable();
             $table->integer('serial')->unique()->nullable();

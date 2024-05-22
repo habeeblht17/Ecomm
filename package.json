@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "@splidejs/splide": "^4.1.4",
-        "alpinejs": "^3.13.3"
+        "alpinejs": "^3.13.3",
+        "swiper": "^11.1.3"
     }
 }
