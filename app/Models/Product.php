@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
@@ -13,8 +13,8 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'brand_id', 'name', 'slug', 'short_description', 'description', 'price',
-        'sku', 'stock', 'type', 'quantity', 'is_visible', 'is_featured', 'image', 'published_at',
+        'brand_id', 'vendor_id', 'category_id', 'sub_category_id', 'child_category_id', 'name', 'slug', 'short_description', 'description', 'price',
+        'sku', 'stock', 'type', 'quantity', 'is_visible', 'is_featured', 'is_approved', 'image', 'published_at',
     ];
 
     /**
@@ -62,6 +62,15 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    /**
+     * vendor
+     *
+     * @return BelongsTo
+     */
+    public function vendor() : BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
+    }
 
     /**
      * categories
@@ -70,7 +79,27 @@ class Product extends Model
      */
     public function categories() : BelongsToMany
     {
-        return $this->belongsToMany(Category::class)->withTimestamps();
+        return $this->belongsToMany(Category::class);
+    }
+
+    /**
+     * subCategory
+     *
+     * @return BelongsTo
+     */
+    public function subCategory() : BelongsTo
+    {
+        return $this->belongsTo(SubCategory::class);
+    }
+
+    /**
+     * childCategory
+     *
+     * @return BelongsTo
+     */
+    public function childCategory() : BelongsTo
+    {
+        return $this->belongsTo(ChildCategory::class);
     }
 
 }

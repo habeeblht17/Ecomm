@@ -21,14 +21,15 @@ class BrandFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->company;
-        
+
         return [
             'name' => $name,
             'slug' => Str::slug($name),
             'description' => $this->faker->sentence,
             'brand_color' => $this->faker->hexColor,
             'is_visible' => $this->faker->boolean,
-            'image' => $this->faker->imageUrl(640, 480, 'business')
+            'is_featured' => $this->faker->boolean,
+            'logo' => $this->faker->imageUrl(200, 200, 'business', true, 'Faker'),
         ];
     }
 }

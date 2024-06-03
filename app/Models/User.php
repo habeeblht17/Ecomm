@@ -50,6 +50,16 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * vendors
+     *
+     * @return void
+     */
+    public function vendors()
+    {
+        return $this->hasMany(Vendor::class);
+    }
+
+    /**
      * isAdmin
      *
      * @return void

@@ -15,16 +15,17 @@ use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\BrandResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\BrandResource\RelationManagers;
-use Filament\Tables\Actions\ActionGroup;
 
 class BrandResource extends Resource
 {
@@ -43,7 +44,7 @@ class BrandResource extends Resource
 
                 Group::make()->schema([
 
-                    Section::make()->schema([
+                    Section::make('Brand Info')->schema([
 
                         TextInput::make('name')
                         ->required()
@@ -65,10 +66,9 @@ class BrandResource extends Resource
 
                         MarkdownEditor::make('description')
                         ->required()
-                        ->columnSpan('full'),
+                        ->maxLength(200),
 
-
-                    ])->columns(2),
+                    ]),
                 ]),
 
                 // Section Status
@@ -86,12 +86,17 @@ class BrandResource extends Resource
                         ->helperText('Enable or Disable  Product Visibility')
                         ->default(true),
 
+                        Toggle::make('is_featured')
+                        ->label('Featured')
+                        ->helperText('Enable or Disable  Product Featured Status')
+                        ->default(false),
+
                     ]),
 
                     // Section Image
-                    Section::make('Image')->schema([
+                    Section::make('Brand Logo')->schema([
 
-                        FileUpload::make('image')
+                        FileUpload::make('logo')
                         ->directory('brands')
                         ->preserveFilenames()
                         ->image()
@@ -109,7 +114,7 @@ class BrandResource extends Resource
         return $table
             ->columns([
 
-                ImageColumn::make('image'),
+                ImageColumn::make('logo'),
 
                 TextColumn::make('name')
                 ->searchable()
@@ -130,10 +135,28 @@ class BrandResource extends Resource
                 ->sortable()
                 ->toggleable(),
 
+                IconColumn::make('is_featured')
+                ->boolean()
+                ->label('Featured')
+                ->sortable()
+                ->toggleable(),
+
 
             ])
             ->filters([
-                //
+                TernaryFilter::make('is_visible')
+                ->label('Visibility')
+                ->boolean()
+                ->trueLabel('Only Visible Brands')
+                ->falseLabel('Only Hidden Brands')
+                ->native(false),
+
+                TernaryFilter::make('is_featured')
+                ->label('Featured')
+                ->boolean()
+                ->trueLabel('Only Featured Brands')
+                ->falseLabel('Only Hidden Brands')
+                ->native(false),
             ])
             ->actions([
 

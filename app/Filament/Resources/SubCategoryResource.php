@@ -82,6 +82,8 @@ class SubCategoryResource extends Resource
                         Select::make('category_id')
                         ->relationship('category', 'name')
                         ->required()
+                        ->searchable()
+                        ->preload()
                         ->native(false),
                     ]),
 

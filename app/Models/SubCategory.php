@@ -29,10 +29,20 @@ class SubCategory extends Model
      * childCategories
      *
      * @return HasMany
-     */
+    */
     public function childCategories() : HasMany
     {
         return $this->hasMany(ChildCategory::class);
+    }
+
+    /**
+     * products
+     *
+     * @return HasMany
+    */
+    public function products() : HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 
 }

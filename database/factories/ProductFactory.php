@@ -4,10 +4,13 @@ namespace Database\Factories;
 
 use Carbon\Carbon;
 use App\Models\Brand;
+use App\Models\Vendor;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\SubCategory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use App\Models\ChildCategory;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -61,21 +64,33 @@ class ProductFactory extends Factory
         $name = $this->faker->words(2, true);
 
         return [
-            'brand_id' => Brand::inRandomOrder()->first()->id ?? Brand::factory()->create()->id,
+            'brand_id' => Brand::factory(),
+            'vendor_id' => Vendor::factory(),
+            'category_id' => Category::factory(),
+            'sub_category_id' => SubCategory::factory(),
+            'chaild_category_id' => ChildCategory::factory(),
             'name' => $name,
             'slug' => Str::slug($name),
-            'short_description' => $this->faker->text(100),
-            'description' => $this->faker->text(200),
-            'price' => $this->faker->numberBetween(10, 100),
-            'sku' => strtoupper(Str::random(10)),
+            'short_description' => $this->faker->sentence,
+            'description' => $this->faker->paragraph,
+            'price' => $this->faker->randomFloat(2, 10, 1000),
+            'sale_price' => $this->faker->optional()->randomFloat(2, 5, 500),
+            'sku' => $this->faker->unique()->numerify('SKU-####'),
+            'quantity' => $this->faker->numberBetween(0, 100),
             'stock' => $this->faker->randomElement(['instock', 'outofstock']),
             'type' => $this->faker->randomElement(['deliverable', 'downloadable']),
-            'quantity' => $this->faker->numberBetween(1, 50),
+            'offer_price' => $this->faker->optional()->randomFloat(2, 5, 500),
+            'offer_start_date' => $this->faker->optional()->date,
+            'offer_end_date' => $this->faker->optional()->date,
+            'image' => $filename ? 'products/' . $filename : null,
+            'published_at' => $this->faker->date,
             'is_visible' => $this->faker->boolean,
             'is_featured' => $this->faker->boolean,
-            'image' => $filename ? 'storage/products/' . $filename : null,
-            'published_at' => Carbon::now(),
+            'is_appproved' => $this->faker->boolean,
+            'is_top' => $this->faker->boolean,
+            'is_best' => $this->faker->boolean,
+            'seo_title' => $this->faker->optional()->sentence,
+            'seo_description' => $this->faker->optional()->paragraph,
         ];
     }
-
 }

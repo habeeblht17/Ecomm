@@ -82,11 +82,15 @@ class ChildCategoryResource extends Resource
                         Select::make('category_id')
                         ->relationship('category', 'name')
                         ->required()
+                        ->required()
+                        ->searchable()
                         ->native(false),
 
                         Select::make('sub_category_id')
                         ->relationship('subcategory', 'name')
                         ->required()
+                        ->searchable()
+                        ->preload()
                         ->native(false),
                     ]),
 

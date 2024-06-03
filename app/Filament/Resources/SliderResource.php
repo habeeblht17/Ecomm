@@ -101,7 +101,7 @@ class SliderResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('image'),
+                ImageColumn::make('banner'),
 
                 TextColumn::make('type')
                 ->searchable()
@@ -116,6 +116,10 @@ class SliderResource extends Resource
                 TextColumn::make('serial')
                 ->toggleable(),
 
+                TextColumn::make('btn_url')
+                ->label('Botton Url')
+                ->toggleable(),
+
                 IconColumn::make('is_visible')
                 ->boolean()
                 ->label('Visibility')
@@ -126,8 +130,8 @@ class SliderResource extends Resource
                 TernaryFilter::make('is_visible')
                 ->label('Visibility')
                 ->boolean()
-                ->trueLabel('Only Visible Products')
-                ->falseLabel('Only Hidden Products')
+                ->trueLabel('Only Visible Sliders')
+                ->falseLabel('Only Hidden Sliders')
                 ->native(false),
 
             ])
