@@ -21,6 +21,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -30,14 +31,12 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Columns\BooleanColumn;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductResource\RelationManagers;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Wizard\Step;
 
 class ProductResource extends Resource
 {
@@ -65,6 +64,7 @@ class ProductResource extends Resource
 
                                 TextInput::make('name')
                                 ->required()
+                                ->string()
                                 ->live(onBlur: true)
                                 ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
 
@@ -83,6 +83,7 @@ class ProductResource extends Resource
 
                                 MarkdownEditor::make('description')
                                 ->required()
+                                ->string()
                                 ->columnSpanFull(),
 
                             ])->columns(2),
@@ -94,21 +95,32 @@ class ProductResource extends Resource
 
                             Section::make()->schema([
                                 MarkdownEditor::make('short_description')
+                                ->string()
+                                ->nullable()
                                 ->maxLength(200),
+
                             ])->columnSpanFull(),
 
                             // Inventory and Price section
                             Section::make('Price & Inventory')->schema([
-
                                 TextInput::make('sku')
                                 ->label("SKU (Stock Keeping Unit)")
-                                ->unique(Product::class, 'sku', ignoreRecord: true,)
+                                ->unique(Product::class, 'sku', ignoreRecord: true)
                                 ->required(),
 
                                 TextInput::make('price')
                                 ->numeric()
                                 ->inputMode('decimal')
-                                ->required(),
+                                ->required()
+                                ->lt('sale_price', true, 'Sale Price must be greater than Price')
+                                ->gt('offer_price', true, 'Offer Price must be less than Price'),
+
+
+                                TextInput::make('sale_price')
+                                ->numeric()
+                                ->inputMode('decimal')
+                                ->gt('price', true, 'Sale Price must be greater than Price')
+                                ->nullable(),
 
                                 TextInput::make('quantity')
                                 ->numeric()
@@ -119,17 +131,24 @@ class ProductResource extends Resource
                                 ->label('Offer Price')
                                 ->numeric()
                                 ->inputMode('decimal')
-                                ->required(),
+                                ->lt('price', true, 'Offer Price must be less than Price')
+                                ->nullable(),
 
                                 DatePicker::make('offer_start_date')
                                 ->label('Offer Start Date')
+                                ->date()
                                 ->default(now())
-                                ->native(false),
+                                ->before('offer_end_date', true, 'Offer Start Date must be before Offer End Date')
+                                ->native(false)
+                                ->nullable(),
 
                                 DatePicker::make('offer_end_date')
                                 ->label('Offer End Date')
+                                ->date()
                                 ->default(now())
-                                ->native(false),
+                                ->after('offer_start_date', true, 'Offer End Date must be after Offer Start Date')
+                                ->native(false)
+                                ->nullable(),
 
                                 Select::make('stock')->options([
                                     'instock' => ProductStockEnum::INSTOCK->value,
@@ -153,6 +172,7 @@ class ProductResource extends Resource
                                 FileUpload::make('image')
                                 ->directory('products')
                                 ->preserveFilenames()
+                                ->maxSize(2048) // 2MB
                                 ->required()
                                 ->image()
                                 ->imageEditor(),
@@ -253,40 +273,50 @@ class ProductResource extends Resource
                             // SEO (Meta) section
                             Section::make('SEO (Meta)')->schema([
 
-                                TextInput::make('title')
+                                TextInput::make('seo_title')
+                                ->string()
+                                ->nullable()
                                 ->maxLength(225),
 
-                                Textarea::make('description')
+                                Textarea::make('seo_description')
+                                ->string()
+                                ->nullable()
                                 ->maxLength(200),
                             ]),
 
                         ]),
                     ])->columns(2),
-                ])->columnSpanFull(),
 
-                Wizard::make([
 
-                    Step::make('Info')->schema([
+                    Step::make('Galleries')->schema([
 
                         Group::make()->schema([
 
                             // Section Image
                             Section::make('Image')->schema([
 
-                                Repeater::make(),
-                                
-                                FileUpload::make('image')
-                                ->directory('products')
-                                ->preserveFilenames()
-                                ->required()
-                                ->image()
-                                ->imageEditor(),
+                                Repeater::make('Galleries')
+                                ->relationship('galleries')
+                                ->schema([
+
+                                    FileUpload::make('image')
+                                    ->directory('products/galleries')
+                                    ->preserveFilenames()
+                                    ->maxSize(2048) // 2MB
+                                    ->required()
+                                    ->image()
+                                    ->imageEditor()
+                                    ->label('Gallery Image'),
+                                ])
+                                ->columns(1)
+                                ->label('Product Gallery'),
 
                             ])->collapsible(),
 
                         ]),
 
                     ])->columns(2),
+
                 ])->columnSpanFull(),
 
             ]);
@@ -323,6 +353,7 @@ class ProductResource extends Resource
                 ->toggleable(),
 
                 TextColumn::make('price')
+                ->money()
                 ->searchable()
                 ->sortable(),
 
@@ -434,4 +465,5 @@ class ProductResource extends Resource
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
+
 }

@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     {
 
         //
-        //Seed user, brand and category model fisrt
+        //Seed user, brand, vendor and category model fisrt
         //before seeding product model.
         //
 
@@ -67,9 +67,11 @@ class DatabaseSeeder extends Seeder
 
         \App\Models\Brand::factory(5)->create();
         \App\Models\Category::factory(5)->create();
+        \App\Models\SubCategory::factory(5)->create();
+        \App\Models\ChildCategory::factory(5)->create();
         \App\Models\Slider::factory(5)->create();
         \App\Models\Vendor::factory(1)->create();
-         \App\Models\Product::factory(5)->create();
+        \App\Models\Product::factory(5)->create();
         // \App\Models\User::factory(5)->create();
 
 

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('vendor_id')->constrained('vendors')->cascadeOnDelete();
             $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
             $table->foreignId('sub_category_id')->constrained('sub_categories')->cascadeOnDelete();
-            $table->foreignId('chaild_category_id')->constrained('child_categories')->cascadeOnDelete();
+            $table->foreignId('child_category_id')->constrained('child_categories')->cascadeOnDelete();
 
             $table->string('name');
             $table->string('slug')->unique();

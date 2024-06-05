@@ -22,8 +22,8 @@ class ChildCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'category_id' => Category::factory(), // Generates a new category if needed
-            'sub_category_id' => SubCategory::factory(), // Generates a new sub-category if needed
+            'category_id' => Category::pluck('id')->random(),
+            'sub_category_id' => SubCategory::pluck('id')->random(),
             'name' => $this->faker->word,
             'slug' => $this->faker->unique()->slug,
             'is_visible' => $this->faker->boolean,

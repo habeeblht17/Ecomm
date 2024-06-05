@@ -64,11 +64,11 @@ class ProductFactory extends Factory
         $name = $this->faker->words(2, true);
 
         return [
-            'brand_id' => Brand::factory(),
-            'vendor_id' => Vendor::factory(),
-            'category_id' => Category::factory(),
-            'sub_category_id' => SubCategory::factory(),
-            'chaild_category_id' => ChildCategory::factory(),
+            'brand_id' => Brand::pluck('id')->random(),
+            'vendor_id' => Vendor::pluck('id')->random(),
+            'category_id' => Category::pluck('id')->random(),
+            'sub_category_id' => SubCategory::pluck('id')->random(),
+            'child_category_id' => ChildCategory::pluck('id')->random(),
             'name' => $name,
             'slug' => Str::slug($name),
             'short_description' => $this->faker->sentence,
