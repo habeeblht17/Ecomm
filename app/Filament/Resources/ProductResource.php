@@ -5,14 +5,17 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Product;
+use App\Models\Variant;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
+use App\Models\Attribute;
 use Filament\Tables\Table;
 use App\Models\SubCategory;
 use Illuminate\Support\Str;
 use App\Models\ChildCategory;
 use App\Enums\ProductTypeEnum;
+use App\Models\AttributeValue;
 use App\Enums\ProductStockEnum;
 use Filament\Resources\Resource;
 use Illuminate\Support\Collection;
@@ -111,9 +114,7 @@ class ProductResource extends Resource
                                 TextInput::make('price')
                                 ->numeric()
                                 ->inputMode('decimal')
-                                ->required()
-                                ->lt('sale_price', true, 'Sale Price must be greater than Price')
-                                ->gt('offer_price', true, 'Offer Price must be less than Price'),
+                                ->required(),
 
 
                                 TextInput::make('sale_price')
@@ -137,7 +138,7 @@ class ProductResource extends Resource
                                 DatePicker::make('offer_start_date')
                                 ->label('Offer Start Date')
                                 ->date()
-                                ->default(now())
+                                ->placeholder('d/m/y')
                                 ->before('offer_end_date', true, 'Offer Start Date must be before Offer End Date')
                                 ->native(false)
                                 ->nullable(),
@@ -145,7 +146,7 @@ class ProductResource extends Resource
                                 DatePicker::make('offer_end_date')
                                 ->label('Offer End Date')
                                 ->date()
-                                ->default(now())
+                                ->placeholder('d/m/y')
                                 ->after('offer_start_date', true, 'Offer End Date must be after Offer Start Date')
                                 ->native(false)
                                 ->nullable(),
@@ -285,10 +286,11 @@ class ProductResource extends Resource
                             ]),
 
                         ]),
+
                     ])->columns(2),
 
 
-                    Step::make('Galleries')->schema([
+                    Step::make('Galleries & Variants')->schema([
 
                         Group::make()->schema([
 
@@ -309,11 +311,76 @@ class ProductResource extends Resource
                                     ->label('Gallery Image'),
                                 ])
                                 ->columns(1)
-                                ->label('Product Gallery'),
+                                ->label('Product Gallery')
+                                ->grid(2),
 
                             ])->collapsible(),
 
-                        ]),
+                        ])->columnSpanFull(),
+
+                        Group::make()->schema([
+
+                            Section::make('Variants')->schema([
+                                Repeater::make('variants')
+                                ->relationship('variants')
+                                ->schema([
+                                    TextInput::make('sku')
+                                    ->unique(Variant::class, 'sku', ignoreRecord: true)
+                                    ->required(),
+
+                                    TextInput::make('price')
+                                    ->numeric()
+                                    ->required(),
+
+                                    TextInput::make('quantity')
+                                    ->numeric()
+                                    ->required(),
+
+                                    Select::make('stock')->options([
+                                        'instock' => 'In Stock',
+                                        'outofstock' => 'Out of Stock',
+                                    ])
+                                    ->required()
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false),
+
+                                    Repeater::make('attributes')
+                                    ->relationship('attributes')
+                                    ->schema([
+                                        Select::make('attribute_id')
+                                        ->label('Attribute')
+                                        ->options(Attribute::all()->pluck('name', 'id'))
+                                        ->reactive()
+                                        ->required()
+                                        ->afterStateUpdated(function (callable $set, $state) {
+                                            $set('attribute_value_id', null); // Reset attribute value when attribute changes
+                                        })
+                                        ->searchable()
+                                        ->preload()
+                                        ->native(false),
+
+                                        Select::make('attribute_value_id')
+                                        ->label('Attribute Value')
+                                        ->options(function (callable $get) {
+                                            $attribute = Attribute::find($get('attribute_id'));
+                                            if (!$attribute) {
+                                                return AttributeValue::all()->pluck('value', 'id'); // Provide a default set if no attribute selected
+                                            }
+                                            return $attribute->values()->pluck('value', 'id');
+                                        })
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->native(false),
+
+                                    ])->columns(2),
+
+                                ])->columns(2),
+
+                            ]),
+
+                        ])->columnSpanFull(),
 
                     ])->columns(2),
 

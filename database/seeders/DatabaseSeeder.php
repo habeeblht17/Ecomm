@@ -72,7 +72,10 @@ class DatabaseSeeder extends Seeder
         \App\Models\Slider::factory(5)->create();
         \App\Models\Vendor::factory(1)->create();
         \App\Models\Product::factory(5)->create();
-        // \App\Models\User::factory(5)->create();
+        \App\Models\Attribute::factory(5)->create();
+        \App\Models\AttributeValue::factory(5)->create();
+        \App\Models\Variant::factory(5)->create();
+        \App\Models\VariantAttribute::factory(5)->create();
 
 
     }
